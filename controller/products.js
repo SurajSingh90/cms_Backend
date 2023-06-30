@@ -40,11 +40,11 @@ exports.createProducts = async (req, res) => {
 };
 
 exports.editProducts = async (req, res) => {
-  const editId = req.params.editId;
-  console.log("iddd", editId);
+  const id = req.params.id;
+  console.log("iddd", id);
   try {
-    const findProducts = await products.findOne(editId);
-    console.log(findProducts);
+    const findProducts = await products.findOne({ _id: id });
+    console.log("productssss", findProducts);
     if (!findProducts) {
       return res.status(404).json({ message: "Products Not Founds" });
     }
