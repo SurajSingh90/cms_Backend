@@ -1,4 +1,5 @@
 const Purchage = require("../model/buyproduct");
+const Product = require("../model/products");
 
 exports.createPurchage = async (req, res) => {
   const {
@@ -128,3 +129,4 @@ exports.deletePurchage = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+

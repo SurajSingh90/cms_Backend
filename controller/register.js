@@ -126,4 +126,7 @@ exports.getUsers = async (req, res) => {
   return res.status(200).send(findUsers);
 };
 
-exports.logouts = async (req, res) => {};
+exports.getallusers = async (req, res) => {
+  const results = await register.find();
+  res.send(results);
+};

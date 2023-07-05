@@ -121,7 +121,33 @@ exports.AllProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    res.status(200).json({ product: result });
+    console.log(result.length);
+
+    let recentArticles = [];
+    const recentCount = 3;
+    const startIndex = Math.max(result.length - recentCount, 0);
+    console.log("indexxxxxxx", startIndex);
+    for (let i = startIndex; i < result.length; i++) {
+      console.log("rrrrrrrrrrrrr", result[i]);
+      recentArticles.push(result[i]);
+    }
+
+    console.log("recentArticles", recentArticles);
+
+    res.status(200).json({ product: result, recentArticles: recentArticles });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.reactProducts = async (req, res) => {
+  try {
+    const findProduct = await Product.find();
+    if (!findProduct) {
+      res.status(404).send({ mes: "Product Not Found" });
+    }
+    res.state(200).send({ message: "All Product ", Products: findProduct });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
