@@ -40,3 +40,89 @@ exports.logout = async (req, res) => {
     }
   };
   
+
+
+
+
+// Otp senddddddddddddddddd
+const nodemailer = require("nodemailer")
+const {EMAIL,PASSWORD} = require('../env')
+const Mailgen = require('mailgen')
+
+module.exports ={
+    EMAIL:"singhsuraj90901@gmail.com",
+    PASSWORD:"bbcyzfhrxjfueaes"
+}
+
+
+    
+    
+  
+exports.sendOtp = async(req,res)=>{
+    try{
+        const {email}= req.body
+        const user = await User.findOne({ email });
+       if (!user) {
+           return res.status(404).json({ message: "User not found" });
+       }
+
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+    user.otp = otp;
+    user.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    await user.save();
+        let config ={
+            service:"gmail",
+            auth:{
+                user:EMAIL,
+                pass:PASSWORD
+            }
+        }
+        let transport = nodemailer.createTransport(config)
+        let MailGenrator = new Mailgen({
+            theme:"default",
+            product : {
+                name: "Barber",
+                link : 'https://mailgen.js/'
+            }
+        })
+        let response ={
+            body:{
+                // name : "Daily Tuition",
+                // intro: "Your bill has arrived!",
+                text: `Your One-Time Password (OTP) is: ${otp}`,
+                table : {
+                    data : [
+                        // {
+                        //     item : "Nodemailer Stack Book",
+                        //     description: "A Backend application",
+                        //     price : "$10.99",
+                        // }
+                        {
+                            text: `Your One-Time Password (OTP) is: ${otp}`,
+                        }
+                    ]
+                },
+                outro: "Looking forward to do more business"
+            }
+        }
+        let mail = MailGenrator.generate(response)
+        let messages = {
+            from:EMAIL,
+            to:email,
+            subject:"Otp Verfication",
+            html:mail
+        }
+        transport.sendMail(messages).then(()=>{
+            return res.status(200).json({message:"Otp Send Successfully"})
+        }).catch(error=>{
+            console.log("errrrrrrrr",error);
+            return res.status(500).json({error})
+        })
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    
+} 
