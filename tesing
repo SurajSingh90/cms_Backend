@@ -1,0 +1,37 @@
+: if (req.body.email && req.body.email !== findUsers.email) {
+      const findEmail = await register
+        .findOne({ email: req.body.email })
+        .lean();
+      if (findEmail && findEmail._id !== tokenId) {
+        return res.status(403).json({ message: "Email already registered." });
+      }
+
+      findUsers.email = req.body.email;
+    }
+ export const signOut = async (req, res) => {
+  try {
+    let id = req.id;
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader) {
+      return res.status(401).json({ message: "Token not found." });
+    }
+
+    const token = authorizationHeader.split(" ")[1];
+
+    const findUser = await register.find({ _id: id, tokens: token });
+
+    if (findUser.length === 0) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const newTokens = findUser.filter((t) => t.tokens == token);
+
+    await register.findByIdAndUpdate(newTokens[0]._id, { tokens: "" });
+
+    res
+      .status(200)
+      .json({ message: "You have successfully logged out.", status: true });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error.", status: false });
+  }
+};
